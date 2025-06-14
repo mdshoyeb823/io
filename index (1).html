@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>For My Nuggu 🥰</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #fde4e4; /* A slightly warmer pink */
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    #contentContainer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 2;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+    }
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        color: #333;
+        font-family: 'Comic Neue', cursive;
+        max-width: 95%;
+        width: 550px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    #musicButton {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 100;
+        background-color: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        display: none; 
+    }
+     .gemini-button, #downloadImageButton {
+      transition: all 0.3s ease;
+    }
+    .gemini-button:hover, #downloadImageButton:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    #geminiOutput {
+        min-height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        background-color: #fdf2f8; /* very light pink */
+        border: 1px dashed #f9a8d4; /* pink-300 */
+        text-align: left;
+    }
+    #geminiOutput img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 8px;
+        object-fit: contain;
+    }
+  </style>
+</head>
+<body class="bg-pink-50">
+  <canvas id="loveCanvas"></canvas>
+  <audio id="loveSong" loop src="https://www.bensound.com/bensound-music/bensound-romance.mp3" preload="metadata"></audio>
+
+  <button id="musicButton">
+      <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#333" class="hidden"><path d="M8 5v14l11-7z"/></svg>
+      <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#333"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  </button>
+
+  <div id="contentContainer">
+    <h1 class="text-6xl md:text-7xl text-pink-500 mb-4 animate-pulse" style="font-family: 'Dancing Script', cursive;">Nuggu 🥰</h1>
+    <h2 class="text-3xl md:text-4xl text-pink-700 mb-12" style="font-family: 'Comic Neue', cursive;">I love you! ❤️</h2>
+    <div id="buttonWrapper" class="relative flex justify-center items-center gap-4 h-20">
+        <button id="actionButton" class="bg-pink-400 text-white font-bold py-4 px-10 rounded-full text-2xl shadow-lg hover:shadow-2xl z-10 transition-transform hover:scale-110">
+          Click Me! 🥰
+        </button>
+    </div>
+  </div>
+
+  <div id="responseModal" class="modal-backdrop hidden">
+      <div class="modal-content">
+          <p class="text-2xl font-bold text-pink-500">A special surprise for you...</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+            <button id="generatePoemButton" class="gemini-button bg-pink-500 text-white font-bold py-3 px-4 rounded-full hover:bg-pink-600">✨ Write a Poem</button>
+            <button id="generateStoryButton" class="gemini-button bg-teal-500 text-white font-bold py-3 px-4 rounded-full hover:bg-teal-600">📖 Generate Story</button>
+            <button id="generateImageButton" class="gemini-button bg-purple-500 text-white font-bold py-3 px-4 rounded-full hover:bg-purple-600">💖 Generate Image</button>
+          </div>
+
+          <div id="geminiOutput">
+             <p class="text-gray-500 text-center w-full">Click a button above!</p>
+          </div>
+
+          <div id="downloadButtonContainer" class="mt-4 hidden">
+             <a id="downloadImageButton" href="#" download="for-nuggu-with-love.png" class="inline-flex items-center gap-2 bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold py-2 px-6 rounded-full shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Download Image
+             </a>
+          </div>
+
+          <button id="closeModal" class="mt-8 bg-gray-300 text-gray-700 font-bold py-2 px-6 rounded-full hover:bg-gray-400">Close</button>
+      </div>
+  </div>
+
+
+  <script>
+    // --- Canvas and animation elements (Unchanged) ---
+    const canvas = document.getElementById("loveCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let elements = [];
+    const elementTypes = ['heart', 'teddy', 'gift', 'letter'];
+    function random(min, max) { return Math.random() * (max - min) + min; }
+    class LoveElement { constructor(x, y) { this.x = x || random(0, canvas.width); this.y = y || random(canvas.height, canvas.height + 100); this.size = random(20, 40); this.speedY = random(0.5, 2); this.speedX = random(-0.5, 0.5); this.alpha = random(0.7, 1); this.angle = random(-Math.PI / 8, Math.PI / 8); this.color = `hsl(${random(330, 360)}, 100%, 80%)`; } update() { this.y -= this.speedY; this.x += this.speedX; if (this.y < -this.size * 2) { this.y = canvas.height + this.size; this.x = random(0, canvas.width); } } draw() { /* Implemented by subclasses */ } }
+    class Heart extends LoveElement { draw() { ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.beginPath(); const t = this.size * 0.3; ctx.moveTo(0, t); ctx.bezierCurveTo(0, 0, -this.size / 2, 0, -this.size / 2, t); ctx.bezierCurveTo(-this.size / 2, this.size * (2/3), 0, this.size * (2/3), 0, this.size); ctx.bezierCurveTo(0, this.size * (2/3), this.size / 2, this.size * (2/3), this.size / 2, t); ctx.bezierCurveTo(this.size / 2, 0, 0, 0, 0, t); ctx.closePath(); ctx.fill(); ctx.restore(); } }
+    class Teddy extends LoveElement { constructor(x, y) { super(x, y); this.size = random(30, 50); this.color = `hsl(30, 50%, ${random(60, 80)}%)`; } draw() { ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(0, -this.size / 2, this.size / 3, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(-this.size / 3, -this.size / 2 - this.size / 6, this.size / 6, 0, Math.PI * 2); ctx.arc(this.size / 3, -this.size / 2 - this.size / 6, this.size / 6, 0, Math.PI * 2); ctx.fill(); ctx.restore(); } }
+    class Gift extends LoveElement { draw() { ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size); ctx.fillStyle = 'white'; ctx.fillRect(-this.size / 8, -this.size / 2, this.size / 4, this.size); ctx.fillRect(-this.size / 2, -this.size / 8, this.size, this.size / 4); ctx.restore(); } }
+    class Letter extends LoveElement { draw() { ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle); ctx.globalAlpha = this.alpha; ctx.fillStyle = 'white'; ctx.strokeStyle = this.color; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-this.size/2, -this.size/3); ctx.lineTo(this.size/2, -this.size/3); ctx.lineTo(this.size/2, this.size/3); ctx.lineTo(-this.size/2, this.size/3); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-this.size/2, -this.size/3); ctx.lineTo(0, 0); ctx.lineTo(this.size/2, -this.size/3); ctx.stroke(); const s = this.size / 4; ctx.fillStyle = 'red'; ctx.beginPath(); ctx.moveTo(0, s*0.3); ctx.bezierCurveTo(0,0,-s/2,0,-s/2,s*0.3); ctx.bezierCurveTo(-s/2,s*(2/3),0,s*(2/3),0,s); ctx.bezierCurveTo(0,s*(2/3),s/2,s*(2/3),s/2,s*0.3); ctx.bezierCurveTo(s/2,0,0,0,0,s*0.3); ctx.fill(); ctx.restore(); } }
+    function initElements(count) { elements = []; for (let i = 0; i < count; i++) { const type = elementTypes[Math.floor(random(0, elementTypes.length))]; if (type === 'heart') elements.push(new Heart()); if (type === 'teddy') elements.push(new Teddy()); if (type === 'gift') elements.push(new Gift()); if (type === 'letter') elements.push(new Letter()); } }
+    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); elements.forEach(el => { el.update(); el.draw(); }); requestAnimationFrame(animate); }
+    
+    // --- App Logic ---
+    const actionButton = document.getElementById("actionButton");
+    const responseModal = document.getElementById("responseModal");
+    const closeModal = document.getElementById("closeModal");
+    const musicButton = document.getElementById("musicButton");
+    const audioElement = document.getElementById("loveSong");
+    const playIcon = document.getElementById("playIcon");
+    const pauseIcon = document.getElementById("pauseIcon");
+    const generatePoemButton = document.getElementById("generatePoemButton");
+    const generateStoryButton = document.getElementById("generateStoryButton");
+    const generateImageButton = document.getElementById("generateImageButton");
+    const geminiOutput = document.getElementById("geminiOutput");
+    const downloadButtonContainer = document.getElementById("downloadButtonContainer");
+    const downloadImageButton = document.getElementById("downloadImageButton");
+
+    let audioContext, audioSource;
+    let isPlaying = false, musicReady = false;
+
+    // --- Audio Logic (Unchanged) ---
+    async function setupAndPlayAudio() { if (musicReady) { audioContext.resume(); return; } audioContext = new (window.AudioContext || window.webkitAudioContext)(); try { const response = await fetch(audioElement.src); const arrayBuffer = await response.arrayBuffer(); const audioBuffer = await audioContext.decodeAudioData(arrayBuffer); audioSource = audioContext.createBufferSource(); audioSource.buffer = audioBuffer; audioSource.loop = true; audioSource.connect(audioContext.destination); audioSource.start(); isPlaying = true; musicReady = true; musicButton.style.display = 'flex'; pauseIcon.classList.remove('hidden'); playIcon.classList.add('hidden'); } catch (error) { console.error("Error setting up audio:", error); musicButton.style.display = 'none'; } }
+    
+    const geminiButtons = [generatePoemButton, generateStoryButton, generateImageButton];
+    
+    function setLoadingState(isLoading) {
+        if (isLoading) {
+            geminiOutput.innerHTML = `<p class="text-pink-500 animate-pulse text-center w-full">✨ नग्गू के लिए कुछ खास बना रहा हूँ...</p>`;
+            geminiButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            downloadButtonContainer.classList.add('hidden');
+        } else {
+             geminiButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
+        }
+    }
+
+    // --- ✨ GEMINI API FUNCTIONS ---
+    async function callGeminiForText(prompt) {
+        setLoadingState(true);
+        const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+        const apiKey = ""; // Leave blank
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+        try {
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
+            const result = await response.json();
+            
+            if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                const generatedText = result.candidates[0].content.parts[0].text;
+                geminiOutput.innerHTML = `<p class="text-md text-pink-800 whitespace-pre-wrap">${generatedText}</p>`;
+            } else {
+                throw new Error("Invalid response structure from text API.");
+            }
+        } catch (error) {
+            console.error("Gemini Text API Error:", error);
+            geminiOutput.innerHTML = `<p class="text-red-500 text-center w-full">Could not generate a response. Please try again later. ❤️</p>`;
+        } finally {
+            setLoadingState(false);
+        }
+    }
+
+    async function generateImage() {
+        setLoadingState(true);
+
+        // **IMPROVED RANDOMIZATION LOGIC**
+        const maleCharacters = ["Tom from Tom and Jerry", "Shinchan", "Doremon", "Oggy", "Sid from Ice Age", "a male Minion", "Winnie the Pooh", "Prince Charming"];
+        const femaleCharacters = ["a cute female cat character named Toots", "Neni from Shinchan", "Shizuka from Doremon", "Olivia from Oggy and the Cockroaches", "Cinderella", "Elsa from Frozen", "a character named Mona", "a female Minion"];
+        
+        const randomMale = maleCharacters[Math.floor(Math.random() * maleCharacters.length)];
+        const randomFemale = femaleCharacters[Math.floor(Math.random() * femaleCharacters.length)];
+
+        const prompt = `
+A super cute, whimsical, and expressive digital art image. The scene must feature exactly two characters: the male character ${randomMale} and the female character ${randomFemale}.
+Both characters should be drawn in a very cute, chibi style.
+
+The two characters should be shown in a dynamic situation expressing a clear emotion:
+- **Joy/Happiness:** Jumping for joy, hugging tightly, laughing together, sharing a sweet kiss.
+- **Sadness:** Comforting each other, one character crying while the other offers a hug.
+- **Anger/Playful Fighting:** A comical chase, playfully punching or bonking each other with oversized, soft items, having a pillow fight.
+- **Excitement:** Discovering a treasure, pointing excitedly at something amazing off-screen.
+- **Quiet Moments:** One character snoring loudly while the other looks on with affection or annoyance, sleeping peacefully together.
+
+The background should be a beautiful and imaginative setting, picking from one of these themes:
+- **Magical Worlds:** An enchanted forest, a crystal cave, floating islands, a candy land, an underwater kingdom.
+- **Nature Scenes:** A Japanese garden, tulip fields, under the Aurora Borealis, a snowy cabin, a tropical beach, a sunflower field, a lavender field.
+- **Cityscapes:** Venice, Paris, Tokyo, an Indian palace, a Greek island.
+- **Cozy Settings:** A blanket fort with fairy lights, a library by a fireplace, a cute kitchen, a treehouse.
+- **Artistic Styles:** A watercolor world, an origami landscape, a mosaic pattern, a synthwave city.
+
+The overall mood should be filled with soft pastel colors, glowing light, and magical sparkles, matching the emotion of the scene.
+`;
+        const payload = { instances: [{ prompt: prompt }], parameters: { "sampleCount": 1} };
+        const apiKey = ""; // Leave blank
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+        try {
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
+            const result = await response.json();
+
+            if (result.predictions?.[0]?.bytesBase64Encoded) {
+                const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                geminiOutput.innerHTML = `<img src="${imageUrl}" alt="A special image for Nuggu">`;
+                downloadImageButton.href = imageUrl;
+                downloadButtonContainer.classList.remove('hidden');
+            } else {
+                 throw new Error("Invalid response structure from image API.");
+            }
+        } catch(error) {
+            console.error("Gemini Image API Error:", error);
+            geminiOutput.innerHTML = `<p class="text-red-500 text-center w-full">Could not create an image. Please try again later. ❤️</p>`;
+        } finally {
+            setLoadingState(false);
+        }
+    }
+
+    function generatePoem() {
+        const prompt = "मेरे प्रिय नग्गू के लिए हिंदी में एक छोटी, प्यारी और रोमांटिक कविता लिखो। कविता देवनागरी लिपि में होनी चाहिए और लगभग 8 पंक्तियों की हो।";
+        callGeminiForText(prompt);
+    }
+
+    function generateHindiStory() {
+        const prompt = "मेरे प्रिय नग्गू के लिए हिंदी में एक छोटी, प्यारी और रोमांटिक कहानी लिखो। कहानी देवनागरी लिपि में होनी चाहिए और नग्गू उसका मुख्य पात्र होना चाहिए।";
+        callGeminiForText(prompt);
+    }
+
+    // --- Event Listeners ---
+    actionButton.addEventListener("click", () => {
+      if (!musicReady) { setupAndPlayAudio(); }
+      geminiOutput.innerHTML = `<p class="text-gray-500 text-center w-full">Click a button above!</p>`;
+      downloadButtonContainer.classList.add('hidden');
+      responseModal.classList.remove('hidden');
+      for (let i = 0; i < 200; i++) {
+        const type = elementTypes[Math.floor(random(0, elementTypes.length))]; let burst;
+        const centerX = canvas.width / 2; const centerY = canvas.height / 2;
+        if (type === 'heart') burst = new Heart(centerX, centerY); if (type === 'teddy') burst = new Teddy(centerX, centerY); if (type === 'gift') burst = new Gift(centerX, centerY); if (type === 'letter') burst = new Letter(centerX, centerY);
+        burst.speedY = random(-8, 8); burst.speedX = random(-8, 8); burst.size = random(30, 50);
+        elements.push(burst);
+      }
+    });
+    
+    closeModal.addEventListener("click", () => { responseModal.classList.add('hidden'); });
+    generatePoemButton.addEventListener("click", generatePoem);
+    generateStoryButton.addEventListener("click", generateHindiStory);
+    generateImageButton.addEventListener("click", generateImage);
+    
+    musicButton.addEventListener("click", () => {
+        if (!musicReady) return;
+        if (isPlaying) { audioContext.suspend(); isPlaying = false; pauseIcon.classList.add('hidden'); playIcon.classList.remove('hidden');
+        } else { audioContext.resume(); isPlaying = true; pauseIcon.classList.remove('hidden'); playIcon.classList.add('hidden'); }
+    });
+
+    window.addEventListener("resize", () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initElements(80); });
+    
+    // --- INITIALIZATION ---
+    initElements(80);
+    animate();
+  </script>
+</body>
+</html>
+
